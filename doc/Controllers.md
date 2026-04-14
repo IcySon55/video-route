@@ -53,14 +53,14 @@ Serial devices can be controlled by a local connection over a serial point. This
 
 ### Example
 
-        "crosspoint":{
-            "name":"Extron 300 Crosspoint",
-            "type":"serial",
-            "baud":9600,
-            "parity":"N",
-            "serial":"/dev/ttyUSB0",
-            "cmd_init":["#ESCZXXX"]
-        }
+    "crosspoint":{
+        "name":"Extron 300 Crosspoint",
+        "type":"serial",
+        "baud":9600,
+        "parity":"N",
+        "serial":"/dev/ttyUSB0",
+        "cmd_init":["#ESCZXXX"]
+    }
 
 
 ## Telnet
@@ -84,13 +84,13 @@ Telnet devices use a remote command line interface to accept commands. This soft
 
 Note this example doesn't provide a port because it is assumed to be `23` if not provided.
 
-        "in1606":{
-            "name":"Extron IN1606",
-            "type":"telnet",
-            "connection_skip":3,
-            "ip":"192.168.0.214",
-            "cmd_delay":0.05
-        }
+    "in1606":{
+        "name":"Extron IN1606",
+        "type":"telnet",
+        "connection_skip":3,
+        "ip":"192.168.0.214",
+        "cmd_delay":0.05
+    }
 
 
 ## HTTP GET
@@ -108,12 +108,12 @@ If your device has a basic HTTP URL API the this method will allow you to use th
 
 ### Example
 
-        "dvs510":{
-            "name":"Extron DVS 510",
-            "type":"http_get",
-            "ip":"192.168.0.109",
-            "uri":"/?cmd="
-        }
+    "dvs510":{
+        "name":"Extron DVS 510",
+        "type":"http_get",
+        "ip":"192.168.0.109",
+        "uri":"/?cmd="
+    }
 
 
 # Dedicated Interfaces
@@ -140,11 +140,11 @@ See [list of module functions](https://clvlabs.github.io/PyATEMMax/docs/methods/
 
 ### Example
 
-        "atem":{
-            "name":"Atem Pro Mini ISO",
-            "type":"atem",
-            "ip":"192.168.0.157"
-        }
+    "atem":{
+        "name":"Atem Pro Mini ISO",
+        "type":"atem",
+        "ip":"192.168.0.157"
+    }
 
 
 ## OBS
@@ -165,15 +165,35 @@ Web socket server must be enabled in OBS for this to work.
 
 ### Example
 
-        "stream-pc":{
-            "name":"Streaming Computer",
-            "type":"obs",
-            "timeout":3,
-            "password":"myawesomepassword",
-            "ip":"127.0.0.1",
-            "port":"4455"
-        }
+    "stream-pc":{
+        "name":"Streaming Computer",
+        "type":"obs",
+        "timeout":3,
+        "password":"myawesomepassword",
+        "ip":"127.0.0.1",
+        "port":"4455"
+    }
 
 
+## InfraRed
+
+*Requires [`PiIR`](https://github.com/ts1/PiIR) python module*
+
+*Requires [`pigpiod`](https://abyz.me.uk/rpi/pigpio/download.html) gpio daemon*
 
 
+Remote buttons are called by their names found in the json configuration for each remote.
+
+### Properties
+
+- `remote` : The json filename of the remote functions to use (remote configuration files should be in the `remotes` directory)
+- `gpio_pin` : The GPIO pin used to transmit the IR signals on
+
+### Example
+
+    "remote":{
+        "name":"LCD TV",
+        "type":"ir",
+        "remote":"sony_x750.json",
+        "gpio_pin":17
+    }
