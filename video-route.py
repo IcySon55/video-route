@@ -142,6 +142,7 @@ class WebInterface(object):
         self.video_controllers["http_get"] = self.cmd_http_get
         self.video_controllers["atem"] = self.cmd_atem
         self.video_controllers["obs"] = self.cmd_obs
+        self.video_controllers["ir"] = self.cmd_ir
 
         # Module load information for each device type
         self.controller_modules = {}
@@ -194,7 +195,6 @@ class WebInterface(object):
                             import serial
                             import serial.tools.list_ports
                             self.controller_modules["serial"] = True
-
                         except Exception as e:
                             print("Need to install Python module [pyserial]")
                             sys.exit(1)
@@ -207,13 +207,11 @@ class WebInterface(object):
                             print("Need to install Python module [telnetlib3]")
                             sys.exit(1)
                     case "http_get":
-
                         global request_url
                         global parse
                         from urllib import request as request_url, parse
                         self.controller_modules["http_get"] = True
                     case "atem":
-
                         try:
                             global PyATEMMax
                             import PyATEMMax
@@ -222,13 +220,20 @@ class WebInterface(object):
                             print("Need to install Python module [PyATEMMax]")
                             sys.exit(1)
                     case "obs":
-
                         try:
                             global obs
                             import obsws_python as obs
                             self.controller_modules["obs"] = True
                         except Exception as e:
                             print("Need to install Python module [obsws-python]")
+                            sys.exit(1)
+                    case "ir":
+                        try:
+                            global ir
+                            import piir as ir
+                            self.controller_modules["ir"] = True
+                        except Exception as e:
+                            print("Need to install Python module [PiIR]")
                             sys.exit(1)
 
         # Skip initialization commands or not
@@ -381,6 +386,28 @@ class WebInterface(object):
                             pprint(getattr(data,data.attrs()[0]))
                     else:
                         print(f"Error with device [{name}]: OBS has no function [{function}]")
+                time.sleep(cmd_delay)
+
+        except Exception as e:
+            print(f"Error with device [{name}]:" + repr(e))
+
+
+    def cmd_ir(self,cmds,config):
+        """
+        Send IR signals through the GPIO pins on a Raspberry Pi.
+        Sending is typically on gpio pin 17 but can be configured using "gpio_pin":17.
+
+        :param cmds: Commands as list of of dicts with function name as key and parameters as value
+        :param config: Device controller configuration
+        :return: returns nothing
+        """
+        cmd_delay=config["cmd_delay"] if "cmd_delay" in config else 0
+        name=config["name"] if "name" in config else config["type"]
+        pin=config["gpio_pin"] if "gpio_pin" in config else 17
+        try:
+            remote = ir.Remote(f"remotes/{config['remote']}", pin)
+            for cmd in cmds:
+                remote.send(cmd)
                 time.sleep(cmd_delay)
 
         except Exception as e:
